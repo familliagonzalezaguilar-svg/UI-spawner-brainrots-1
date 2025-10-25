@@ -1,0 +1,110 @@
+--[[
+==========================
+===  CLIENTE (LocalScript)
+===  StarterPlayerScripts o StarterGui
+==========================
+]]
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local remote = ReplicatedStorage:WaitForChild("SpawnBrainrot")
+
+-- Crear la UI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DeltaBrainrotUI"
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 220, 0, 110)
+Frame.Position = UDim2.new(0.5, -110, 0.5, -55)
+Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 40)
+Frame.Parent = ScreenGui
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "Delta Brainrot Spawner"
+Title.TextColor3 = Color3.fromRGB(255, 255, 50)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 18
+Title.Parent = Frame
+
+local Button = Instance.new("TextButton")
+Button.Size = UDim2.new(1, -30, 0, 40)
+Button.Position = UDim2.new(0, 15, 0, 40)
+Button.Text = "Spawnear Delta Brainrot"
+Button.BackgroundColor3 = Color3.fromRGB(60, 200, 60)
+Button.TextColor3 = Color3.fromRGB(255,255,255)
+Button.Font = Enum.Font.GothamBold
+Button.TextSize = 16
+Button.Parent = Frame
+
+Button.MouseButton1Click:Connect(function()
+    if Frame:FindFirstChild("OptionMeowl") or Frame:FindFirstChild("OptionElephant") then return end
+
+    local OptionMeowl = Instance.new("TextButton")
+    OptionMeowl.Name = "OptionMeowl"
+    OptionMeowl.Size = UDim2.new(0.45, 0, 0, 35)
+    OptionMeowl.Position = UDim2.new(0.05, 0, 1, 5)
+    OptionMeowl.Text = "Meowl"
+    OptionMeowl.BackgroundColor3 = Color3.fromRGB(120, 120, 255)
+    OptionMeowl.TextColor3 = Color3.new(1, 1, 1)
+    OptionMeowl.Font = Enum.Font.GothamBold
+    OptionMeowl.TextSize = 15
+    OptionMeowl.Parent = Frame
+
+    OptionMeowl.MouseButton1Click:Connect(function()
+        remote:FireServer("Meowl")
+        OptionMeowl:Destroy()
+        if Frame:FindFirstChild("OptionElephant") then Frame.OptionElephant:Destroy() end
+    end)
+
+    local OptionElephant = Instance.new("TextButton")
+    OptionElephant.Name = "OptionElephant"
+    OptionElephant.Size = UDim2.new(0.45, 0, 0, 35)
+    OptionElephant.Position = UDim2.new(0.5, 0, 1, 5)
+    OptionElephant.Text = "Strawberry Elephant"
+    OptionElephant.BackgroundColor3 = Color3.fromRGB(255, 120, 120)
+    OptionElephant.TextColor3 = Color3.new(1, 1, 1)
+    OptionElephant.Font = Enum.Font.GothamBold
+    OptionElephant.TextSize = 15
+    OptionElephant.Parent = Frame
+
+    OptionElephant.MouseButton1Click:Connect(function()
+        remote:FireServer("Strawberry Elephant")
+        OptionElephant:Destroy()
+        if Frame:FindFirstChild("OptionMeowl") then Frame.OptionMeowl:Destroy() end
+    end)
+end)
+
+--[[
+==========================
+===  SERVIDOR (Script)
+===  ServerScriptService
+==========================
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local remote = ReplicatedStorage:FindFirstChild("SpawnBrainrot")
+if not remote then
+    remote = Instance.new("RemoteEvent")
+    remote.Name = "SpawnBrainrot"
+    remote.Parent = ReplicatedStorage
+end
+
+remote.OnServerEvent:Connect(function(player, modelName)
+    local char = player.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+
+    local spawnPos = char.HumanoidRootPart.Position + Vector3.new(3, 0, 0)
+    local modelToSpawn = ReplicatedStorage:FindFirstChild(modelName)
+    if modelToSpawn and modelToSpawn:IsA("Model") and modelToSpawn.PrimaryPart then
+        local clone = modelToSpawn:Clone()
+        clone:SetPrimaryPartCFrame(CFrame.new(spawnPos))
+        clone.Parent = workspace
+    else
+        warn("Modelo '"..modelName.."' no encontrado en ReplicatedStorage o sin PrimaryPart")
+    end
+end)
